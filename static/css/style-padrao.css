@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&display=swap');
+
+* {
+    font-family: var(--fonte-texto);
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    /* unidade vh (a altura do viewport), permitindo que o body defina um valor minimo de altura com base na altura total do viewport do usuario*/
+}
+
+:root {
+    --background: #F8F8FF;
+    --cor-header-footer: #e7e7e7;
+    --cor-secao: #F5F5F5;
+    --cor-titulo: #000000;
+    --cor-texto: #181818;
+    --cor-texto-claro: beige;
+    --cor-btn-texto: beige;
+    --cor-destaque: #006400;
+    --fonte-titulo: 'Jost';
+    --fonte-texto: 'Oswald';
+}
+
+body {
+    min-height: 100vh;
+    background-color: var(--background);
+}
+
+
+/* estilização do header */
+
+.cabecalho {
+    width: 100%;
+    background-color: var(--cor-header-footer);
+}
+
+.container {
+    display: flex;
+    justify-content: space-around;
+}
+
+#container_icons{
+    display: flex;
+    margin-left: 1rem;
+}
+
+.ul-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items:center;
+    margin: 2rem 3rem 2rem 3rem;
+    width: 40%;
+}
+
+.ul-icons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem 0 1rem 0;
+    width: 100%;
+}
+
+#title_header {
+    font-family: var(--fonte-titulo);
+    font-size: 30px;
+    color: var(--cor-destaque);
+}
+
+/* Estilos do menu de perfil */
+nav li {
+    display: inline-block;
+}
+
+nav li i {
+    display: inline-block;
+    color: var(--cor-texto);
+    text-decoration: none;
+    padding: 15px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    box-shadow: 0 0 5px black;
+    display: none;
+    width: 15rem;
+}
+
+.dropdown-menu a {
+    display: block;
+    color: inherit;
+    color: var(--cor-texto);
+    text-decoration: none;
+    background-color: var(--cor-secao);
+    transition: 0.5s;
+    font-size: 22px;
+    padding: 1rem;
+}
+
+.dropdown-menu a:hover {
+    color: var(--cor-destaque);
+    background-color: var(--cor-header-footer);
+    transition: 0.5s;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+
+/* estilização do footer */
+
+footer {
+    background-color: var(--cor-header-footer);
+    color: var(--cor-titulo);
+    font-family: var(--fonte-texto);
+}
+
+#div_footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+#p_footer {
+    margin-top: 1rem;
+}

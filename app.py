@@ -16,18 +16,28 @@ class Tarefa(db.Model):
     def __repr__(self) -> str:
         return f"Tarefa {self.id}"
 
+class Turma(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    nome = db.Column(db.String(100), nullable = False)
+    professor = db.Column(db.String(100), nullable = False)
+    descricao = db.Column(db.String(100), nullable = False)
+
+    def __repr__(self) -> str:
+        return f"{self.nome}"
+
 with app.app_context():
     db.create_all()
-    
-@app.route("/", methods = ["POST","GET"])
-def index():
+
+#<---------Rotas Principais---------->
+@app.route("/turma", methods = ["POST","GET"])
+def turma():
     if request.method == "POST":
         conteudo_tarefa = request.form.get('conteudo')
         nova_tarefa = Tarefa(conteudo=conteudo_tarefa)
         try:
             db.session.add(nova_tarefa)
             db.session.commit()
-            return redirect("/")
+            return redirect("/turma")
         except Exception as e:
             print(f"ERROR: {e}")
             return f"ERROR: {e}"
@@ -35,13 +45,44 @@ def index():
         tarefas = Tarefa.query.order_by(Tarefa.criado).all()
         return render_template("professor.html", tarefas = tarefas)
 
+@app.route("/")
+@app.route("/home")
+def home():
+    return render_template("home.html")
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/aluno")
+def aluno():
+    return render_template("aluno.html")
+
+@app.route("/professor", methods = ["POST","GET"])
+def professor():
+    if request.method == "POST":
+        nome = request.form.get('nome')
+        professor = request.form.get('professor')
+        descricao = request.form.get('descricao')
+        nova_turma = Turma(nome = nome, professor = professor, descricao = descricao)
+        try:
+            db.session.add(nova_turma)
+            db.session.commit()
+            return redirect("/professor")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            return f"ERROR: {e}"
+    else:
+        turmas = Turma.query.all()
+        return render_template("professor_home.html", turmas = turmas)
+#<---------Rotas Auxiliares da Turma---------->
 @app.route("/delete/<int:id>")
 def delete(id:int):
     deletar = Tarefa.query.get_or_404(id)
     try:
         db.session.delete(deletar)
         db.session.commit()
-        return redirect("/")
+        return redirect("/turma")
     except Exception as e:
         return f"ERROR: {e}"
 
@@ -52,11 +93,12 @@ def edit(id:int):
         task.conteudo = request.form['conteudo']
         try:
             db.session.commit()
-            return redirect("/")
+            return redirect("/turma")
         except Exception as e:
             return f"ERROR: {e}"
     else:
         return render_template("edit.html", task = task)
+#<---------Rotas Auxiliares da Turma_Professor---------->
 
 
 

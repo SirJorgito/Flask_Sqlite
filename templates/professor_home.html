@@ -53,32 +53,23 @@
                 <!-- Aqui é onde as turmas serão listadas dinamicamente -->
                 <ul id="lista_turmas">
                 {% if turmas | length < 1 %}
-                    <h3>Não tem turmas... Crie uma aqui!</h3>
+                    <p id="sem_turmas_msg">Nenhuma turma disponível no momento...</p>
                     {% else %}
-                    <table>
-                        <tr>
-                            <th>Nome da turma</th>
-                            <th>Nome do professor</th>
-                            <th>Descrição</th>
-                            <th>Ações</th>
-
-                        </tr>
                         {% for turma in turmas %}
-                        <tr>
-                            <td>{{ turma.nome }}</td>
-                            <td>{{ turma.professor }}</td>
-                            <td>{{ turma.descricao}}</td>
-
-                        </tr>
+                            <li class="li_turma">
+                                <div>
+                                    <p id="info_turma">{{ turma.nome }}: Prof. {{turma.professor}}</p>
+                                </div>
+                                <div class="buttons_li">
+                                    <a href="/turma" id="ver-btn">Ver</a>
+                                    <a href="/edit/{{ turma.id }}" id="edit-btn">Editar</a><a href="/delete/{{ turma.id }}" id="delete-btn">Excluir</a>
+                                </div>
+                            </li>
                         {% endfor %}    
-                    </table>
+
                     {% endif %}
                 </ul>
             </div>
-        
-            <!-- Texto alternativo caso não existam turmas -->
-            
-            <p id="sem_turmas_msg">Nenhuma turma disponível no momento...</p>
             
         </div>
 

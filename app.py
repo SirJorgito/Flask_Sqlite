@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -125,6 +125,12 @@ def edit(id:int):
             return f"ERROR: {e}"
     else:
         return render_template("edit.html", task = task)
+    
+# Rota para download dos arquivos
+@app.route('/uploads/<path:filename>')
+def download_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+
 #<---------Rotas Auxiliares da Turma_Professor---------->
 
 

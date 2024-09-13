@@ -73,6 +73,7 @@
                                 <p id="info_conteudo">{{ tarefa.conteudo }} ({{ tarefa.criado.strftime("%d-%m-%Y") }})</p>
                             </div>
                             <div class="buttons_li">
+                                <a href="/uploads/{{ tarefa.conteudo }}" id="download-btn" download="{{ tarefa.conteudo }}">Baixar</a>
                                 <a href="/edit/{{ tarefa.id }}" id="edit-btn">Editar</a><a href="/delete/{{ tarefa.id }}" id="delete-btn">Excluir</a>
                             </div>
                         </li>

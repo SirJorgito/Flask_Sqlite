@@ -65,7 +65,6 @@
     background-color: beige;
     width: 100%;
     transition: 0.5s;
-    cursor: pointer;
 }
 
 #lista_conteudos li:hover {
@@ -87,18 +86,15 @@
 }
 
 #edit-btn{
-    border: 1px solid rgb(0, 135, 224);
-    border-radius: 8px;
-    padding: 0.2rem 1rem;
     background-color: rgb(0, 135, 224);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
 }
 
-#delete-btn{
-    border: 1px solid rgb(222, 0, 0);
-    border-radius: 8px;
-    padding: 0.2rem 1rem;
-    background-color: rgb(222, 0, 0);
-}
 
 /* Estilo do botão de upload */
 #form-upload {
@@ -118,6 +114,9 @@
     color: white;
     transition: background-color 0.3s ease;
     margin-right: 10px;
+    transform: scale(1.1);
+    width: 25%;
+    text-align: center;
 }
 
 .custom-file-upload:hover {
@@ -135,6 +134,8 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transform: scale(1.2);
+    margin-left: 1.5rem;
 }
 
 #btn_add:hover {
@@ -145,13 +146,12 @@
     font-size: 20px;
     color: green;
     margin-top: 10px;
-    margin-right: 1rem
+    margin-left: 1rem;
 }
 
 /* Estilo do botão de exclusão */
-.delete-btn {
+#delete-btn {
     background-color: #dc3545;
-    color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 3px;
@@ -160,6 +160,13 @@
     transition: background-color 0.3s ease;
 }
 
-.delete-btn:hover {
-    background-color: #c82333;
+
+#download-btn {
+    background-color: #26a044;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
 }

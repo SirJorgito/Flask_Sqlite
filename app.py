@@ -33,7 +33,6 @@ with app.app_context():
     db.create_all()
 
 #<---------Rotas Principais---------->
-@app.route("/turma", methods = ["POST","GET"])
 @app.route("/turma", methods=["POST", "GET"])
 def turma():
     if request.method == "POST":

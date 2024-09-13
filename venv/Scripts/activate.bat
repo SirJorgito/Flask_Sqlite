@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\pc home maio 2023\Documents\OO\SALAVIRTUAL\Flask_Sqlite\venv
+set VIRTUAL_ENV=c:\Users\User\Documents\Documentos importantes\Flask_Sqlite\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

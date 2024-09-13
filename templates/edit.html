@@ -1,18 +1,22 @@
-{% extends 'base.html' %}
-{% block head %}
-<title>Task Smask</title>
-{% endblock %}
-{% block body %}
-<div class = "content">
-    <hi>Edit your task</hi>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href = {{url_for('static', filename = "styles.css")}}/>
+        
+    </head>
+    <body>
+        <div class = "content">
+            <hi>Edit your task</hi>
 
-     
-    <form action = "/edit/{{task.id}}" method = "POST">
-        <input 
-            type="text" 
-            name="content" 
-            id="content" 
-            value = {{task.content}}>
-        <input type="submit" value="Edit" >
-</div>
-{% endblock %}
+            <form action = "/edit/{{task.id}}" method = "POST">
+                <input 
+                    type="text" 
+                    name="content" 
+                    id="content" 
+                    value = {{task.content}}>
+                <input type="submit" value="Edit">
+        </div>
+    </body>
+</html>

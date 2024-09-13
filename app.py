@@ -117,7 +117,7 @@ def delete(id: int):
 def edit(id:int):
     task = Tarefa.query.get_or_404(id)
     if request.method == "POST":
-        task.conteudo = request.form['conteudo']
+        task.content = request.form['conteudo']
         try:
             db.session.commit()
             return redirect("/turma")

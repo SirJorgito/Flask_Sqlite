@@ -112,6 +112,19 @@ nav li i {
     display: block;
 }
 
+/* STYLE ICONS */
+#voltar {
+    color: inherit;
+    font-size: 3rem;
+    transition: 0.5s;
+    margin-right: 5.5rem;
+}
+
+#voltar:hover {
+    transform: scale(1.05);
+    transition: 0.5s;
+}
+
 
 /* estilização do footer */
 

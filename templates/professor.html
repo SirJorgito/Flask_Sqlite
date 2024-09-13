@@ -63,30 +63,22 @@
             <div class="conteudos">
                 <h1>Lista de Tarefas</h1>
 
-                <!-- Exibe uma mensagem se não houver tarefas -->
+                <ul id="lista_conteudos">
                 {% if tarefas | length < 1 %}
-                <p>Não há tarefas... Crie uma aqui!</p>
-                {% else %}
-                <!-- Tabela de tarefas -->
-                <table>
-                    <tr>
-                        <th>Tarefa</th>
-                        <th>Adicionada</th>
-                        <th>Ações</th>
-                    </tr>
-                    {% for tarefa in tarefas %}
-                    <tr>
-                        <td>{{ tarefa.conteudo }}</td>
-                        <td>{{ tarefa.criado.strftime("%d-%m-%Y") }}</td>
-                        <td>
-                            <!-- Links para editar e excluir -->
-                            <a href="/edit/{{ tarefa.id }}" >Editar</a>
-                            <a href="/delete/{{ tarefa.id }}" class="delete-btn">Excluir</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
+                    <p id="sem_ctd_msg">Nenhum conteúdo disponível no momento...</p>
+                    {% else %}
+                        {% for tarefa in tarefas %}
+                        <li class="li_conteudos">
+                            <div>
+                                <p id="info_conteudo">{{ tarefa.conteudo }} ({{ tarefa.criado.strftime("%d-%m-%Y") }})</p>
+                            </div>
+                            <div class="buttons_li">
+                                <a href="/edit/{{ tarefa.id }}" id="edit-btn">Editar</a><a href="/delete/{{ tarefa.id }}" id="delete-btn">Excluir</a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </section>    

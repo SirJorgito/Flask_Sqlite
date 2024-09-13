@@ -1,11 +1,15 @@
+import os
 from flask import Flask, render_template, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+UPLOAD_FOLDER = 'uploads'
 
 class Tarefa(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -87,12 +91,23 @@ def professor():
     else:
         turmas = Turma.query.all()
         return render_template("professor_home.html", turmas = turmas)
+    
+
 #<---------Rotas Auxiliares da Turma---------->
 @app.route("/delete/<int:id>")
-def delete(id:int):
-    deletar = Tarefa.query.get_or_404(id)
+def delete(id: int):
+    tarefa = Tarefa.query.get_or_404(id)
+    arquivo_caminho = os.path.join(UPLOAD_FOLDER, tarefa.conteudo)  # Caminho completo do arquivo
+
     try:
-        db.session.delete(deletar)
+        # Primeiro, remover o arquivo físico da pasta uploads
+        if os.path.exists(arquivo_caminho):
+            os.remove(arquivo_caminho)
+        else:
+            print(f"Arquivo {arquivo_caminho} não encontrado!")
+
+        # Depois, remover a entrada do banco de dados
+        db.session.delete(tarefa)
         db.session.commit()
         return redirect("/turma")
     except Exception as e:

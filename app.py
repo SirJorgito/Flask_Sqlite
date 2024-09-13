@@ -133,7 +133,35 @@ def download_file(filename):
 
 #<---------Rotas Auxiliares da Turma_Professor---------->
 
+# Rota para excluir uma turma
+@app.route("/delete_turma/<int:id>")
+def delete_turma(id: int):
+    turma = Turma.query.get_or_404(id)
 
+    try:
+        # Remover a turma do banco de dados
+        db.session.delete(turma)
+        db.session.commit()
+        return redirect("/professor")
+    except Exception as e:
+        return f"ERROR: {e}"
+
+# Rota para editar uma turma
+@app.route("/edit_turma/<int:id>", methods=["GET", "POST"])
+def edit_turma(id: int):
+    turma = Turma.query.get_or_404(id)
+    if request.method == "POST":
+        turma.nome = request.form.get('nome')
+        turma.professor = request.form.get('professor')
+        turma.descricao = request.form.get('descricao')
+
+        try:
+            db.session.commit()
+            return redirect("/professor")
+        except Exception as e:
+            return f"ERROR: {e}"
+    else:
+        return render_template("edit_turma.html", turma=turma)
 
 
 if __name__ == "__main__":

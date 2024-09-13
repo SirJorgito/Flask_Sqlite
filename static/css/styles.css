@@ -101,11 +101,11 @@
     background-color: #0056b3;
 }
 
-#file-upload {
+#conteudo {
     display: none;
 }
 
-#btn-enviar {
+#btn_add {
     padding: 10px 20px;
     background-color: #28a745;
     color: white;
@@ -114,7 +114,7 @@
     cursor: pointer;
 }
 
-#btn-enviar:hover {
+#btn_add:hover {
     background-color: #218838;
 }
 

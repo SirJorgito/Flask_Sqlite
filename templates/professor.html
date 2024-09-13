@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="{{url_for('static', filename = 'css/styles.css')}}"/>
+
+    <script src="../../static/js/turma.js"></script>
 </head>
 <body>
     <header class="cabecalho">
@@ -27,7 +29,7 @@
                             
                         </li>
 
-                        <a href="\professor" id="voltar"><i class="bi bi-arrow-left-circle"></i></a>
+                        <a href="/professor" id="voltar"><i class="bi bi-arrow-left-circle"></i></a>
 
                     </ul>
                 </nav>
@@ -44,12 +46,26 @@
 
     <section class="section_painel">
         <div class="painel">
+
+            <!-- Formulário para adicionar nova tarefa -->
+            <form id="form-upload" enctype="multipart/form-data" action="/turma" method="POST">
+                <label for="conteudo" class="custom-file-upload">
+                    <i class="bi bi-cloud-upload"></i> Escolher arquivo
+                </label>
+
+                <input type="file" name="conteudo" id="conteudo" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" required />
+                
+                <p id="file-selected-msg" style="display: none;">Arquivo selecionado: <span id="file-name"></span></p>
+                
+                <button type="submit" value="Adicionar Tarefa" id="btn_add">Enviar</button>
+            </form>
+
             <div class="conteudos">
                 <h1>Lista de Tarefas</h1>
 
                 <!-- Exibe uma mensagem se não houver tarefas -->
                 {% if tarefas | length < 1 %}
-                <h3>Não há tarefas... Crie uma aqui!</h3>
+                <p>Não há tarefas... Crie uma aqui!</p>
                 {% else %}
                 <!-- Tabela de tarefas -->
                 <table>
@@ -71,12 +87,6 @@
                     {% endfor %}
                 </table>
                 {% endif %}
-
-                <!-- Formulário para adicionar nova tarefa -->
-                <form action="/" method="POST">
-                    <input type="text" name="conteudo" id="conteudo" placeholder="Nova tarefa" required>
-                    <input type="submit" value="Adicionar Tarefa" id="btn_add">
-                </form>
             </div>
         </div>
     </section>    

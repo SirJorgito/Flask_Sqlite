@@ -30,20 +30,32 @@ with app.app_context():
 
 #<---------Rotas Principais---------->
 @app.route("/turma", methods = ["POST","GET"])
+@app.route("/turma", methods=["POST", "GET"])
 def turma():
     if request.method == "POST":
-        conteudo_tarefa = request.form.get('conteudo')
-        nova_tarefa = Tarefa(conteudo=conteudo_tarefa)
-        try:
-            db.session.add(nova_tarefa)
-            db.session.commit()
-            return redirect("/turma")
-        except Exception as e:
-            print(f"ERROR: {e}")
-            return f"ERROR: {e}"
+        arquivo = request.files.get('conteudo')  # Captura o arquivo enviado
+        
+        if arquivo:
+            # Nome do arquivo será armazenado no banco de dados
+            nome_arquivo = arquivo.filename
+            nova_tarefa = Tarefa(conteudo=nome_arquivo)
+            
+            try:
+                db.session.add(nova_tarefa)
+                db.session.commit()
+                # Opcional: Salvar o arquivo no servidor
+                caminho_arquivo = f"uploads/{nome_arquivo}"
+                arquivo.save(caminho_arquivo)
+                return redirect("/turma")
+            except Exception as e:
+                print(f"ERROR: {e}")
+                return f"ERROR: {e}"
+        else:
+            return "Nenhum arquivo foi selecionado", 400
     else:
         tarefas = Tarefa.query.order_by(Tarefa.criado).all()
-        return render_template("professor.html", tarefas = tarefas)
+        return render_template("professor.html", tarefas=tarefas)
+
 
 @app.route("/")
 @app.route("/home")

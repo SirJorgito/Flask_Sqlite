@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, request, send_from_directory, session
+from flask import Flask, render_template, redirect, request, send_from_directory, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -212,8 +212,22 @@ def cadastro():
     password = request.form.get("password")
     tipo_perfil = request.form.get("tipo_perfil")
     
+    # Verificar se o email já existe
+    if Usuario.query.filter_by(email=email).first():
+        flash("Email já cadastrado. Tente um email diferente!", "cadastro")
+        return redirect("/login")
+
+    # Verificar se o nome de usuário já existe
+    if Usuario.query.filter_by(username=username).first():
+        flash("Nome de usuário já cadastrado. Escolha um nome diferente!", "cadastro")
+        return redirect("/login")
+
     if tipo_perfil == "aluno":
         matricula = request.form.get("matricula")
+        # Verificar se a matrícula já existe
+        if Aluno.query.filter_by(matricula=matricula).first():
+            flash("Matrícula já cadastrada. Tente uma matrícula diferente!", "cadastro")
+            return redirect("/login")
         novo_aluno = Aluno(username=username, password=password, email=email, matricula=matricula)
         db.session.add(novo_aluno)
     elif tipo_perfil == "professor":
@@ -224,8 +238,8 @@ def cadastro():
         db.session.commit()
         return redirect("/login")
     except Exception as e:
-        return f"Erro ao cadastrar: {e}"
-
+        flash(f"Erro ao cadastrar: {e}", "cadastro")
+        return redirect("/login")
 
 @app.route("/entrar", methods=["POST"])
 def entrar():
@@ -244,7 +258,8 @@ def entrar():
         elif user.tipo_perfil == 'professor':
             return redirect("/professor")
     else:
-        return "Usuário ou senha inválidos", 400
+        flash("Usuário ou senha inválidos", "login")
+        return redirect("/login")
     
 
 if __name__ == "__main__":

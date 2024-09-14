@@ -1,5 +1,3 @@
-<!-- PERSONALIZAAAAAAAAR!!! -->
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -9,14 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOGIN</title>
 
-    <link rel="stylesheet" href="{{url_for('static', filename = 'css/login.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 
     <div class="main-container">
-        <div class="main">  	
+        <div class="main">  
             <input type="checkbox" id="chk" aria-hidden="true">
 
             <ul id="ul-voltar">
@@ -36,6 +34,18 @@
                     <input type="hidden" name="tipo_perfil" value="aluno"> <!-- Campo oculto -->
                     <button type="submit">Cadastrar</button>
                 </form>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes">
+                    {% for category, message in messages %}
+                        {% if category == 'cadastro' %}
+                            <li>{{ message }}</li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% endwith %}
             </div>
 
             <div class="login">
@@ -45,9 +55,22 @@
                     <input type="password" name="password" placeholder="Senha" required="">
                     <button type="submit">Login</button>
                 </form>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes">
+                    {% for category, message in messages %}
+                        {% if category == 'login' %}
+                            <li>{{ message }}</li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% endwith %}
             </div>
         </div>
     </div>
+
 </body>
 
 </html>

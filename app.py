@@ -105,6 +105,12 @@ def home():
 def login():
     return render_template("login.html")
 
+@app.route("/logout")
+def logout():
+    session.clear()  # Limpa todos os dados da sessão
+    return redirect("/home")
+
+
 @app.route("/aluno")
 def aluno():
     return render_template("aluno.html")

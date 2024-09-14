@@ -148,3 +148,13 @@ input[type="number"]::-webkit-outer-spin-button {
 	text-align: center;
 	font-weight: bold;
 }
+
+/* STYLE TIPO PERFIL */
+#tipo-perfil-title {
+	margin: 0;
+}
+
+#tipo-perfil-div {
+	display: flex;
+	justify-content: center;
+}

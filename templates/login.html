@@ -31,7 +31,15 @@
                     <input type="number" name="matricula" placeholder="Matrícula (somente números)" required="">
                     <input type="email" name="email" placeholder="Email" required="">
                     <input type="password" name="password" placeholder="Senha" required="">
-                    <input type="hidden" name="tipo_perfil" value="aluno"> <!-- Campo oculto -->
+                    
+                    <label for="tipo_perfil" id="tipo-perfil-title">Tipo de perfil:</label>
+                    <div id="tipo-perfil-div">
+                        <select name="tipo_perfil" id="tipo_perfil" required>
+                            <option value="aluno">Aluno</option>
+                            <option value="professor">Professor</option>
+                        </select>
+                    </div>
+
                     <button type="submit">Cadastrar</button>
                 </form>
 

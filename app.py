@@ -85,12 +85,20 @@ def turma(turma_id):
         
         if arquivo:
             nome_arquivo = arquivo.filename
+            
+            # Verificar se o diretório 'uploads' existe, se não, criá-lo
+            caminho_diretorio = 'uploads'
+            if not os.path.exists(caminho_diretorio):
+                os.makedirs(caminho_diretorio)
+            
             nova_tarefa = Tarefa(conteudo=nome_arquivo, turma_id=turma_id)
             try:
                 db.session.add(nova_tarefa)
                 db.session.commit()
-                caminho_arquivo = f"uploads/{nome_arquivo}"
-                arquivo.save(caminho_arquivo)
+                
+                caminho_arquivo = os.path.join(caminho_diretorio, nome_arquivo)
+                arquivo.save(caminho_arquivo)  # Salvar o arquivo no diretório 'uploads'
+                
                 return redirect(f"/turma/{turma_id}")
             except Exception as e:
                 return f"ERROR: {e}"
@@ -163,39 +171,38 @@ def acessar_turma():
 @app.route("/delete/<int:id>")
 def delete(id: int):
     tarefa = Tarefa.query.get_or_404(id)
-    arquivo_caminho = os.path.join(UPLOAD_FOLDER, tarefa.conteudo)  # Caminho completo do arquivo
+    arquivo_caminho = os.path.join(UPLOAD_FOLDER, tarefa.conteudo)
 
     try:
-        # Primeiro, remover o arquivo físico da pasta uploads
         if os.path.exists(arquivo_caminho):
             os.remove(arquivo_caminho)
-        else:
-            print(f"Arquivo {arquivo_caminho} não encontrado!")
 
-        # Depois, remover a entrada do banco de dados
         db.session.delete(tarefa)
         db.session.commit()
-        return redirect("/turma")
+        # Redirecionar para a turma correta
+        return redirect(f"/turma/{tarefa.turma_id}")
     except Exception as e:
         return f"ERROR: {e}"
 
-@app.route("/edit/<int:id>", methods= ["GET","POST"])
-def edit(id:int):
+
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+def edit(id: int):
     task = Tarefa.query.get_or_404(id)
     if request.method == "POST":
-        task.content = request.form['conteudo']
+        task.conteudo = request.form['conteudo']  # Corrigir o nome do campo se necessário
         try:
             db.session.commit()
-            return redirect("/turma")
+            return redirect(f"/turma/{task.turma_id}")
         except Exception as e:
             return f"ERROR: {e}"
     else:
-        return render_template("edit.html", task = task)
+        return render_template("edit.html", task=task)
     
 # Rota para download dos arquivos
 @app.route('/uploads/<path:filename>')
 def download_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+    caminho_completo = os.path.abspath(os.path.join(UPLOAD_FOLDER, filename))
+    return send_from_directory(caminho_completo, filename, as_attachment=True)
 
 #<---------Rotas Auxiliares da Turma_Professor---------->
 

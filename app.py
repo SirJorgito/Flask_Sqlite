@@ -127,17 +127,31 @@ def logout():
 
 @app.route("/aluno")
 def aluno():
+    if 'user_id' not in session:
+        return redirect("/login")
+    
+    
+    
     user_id = session.get('user_id')
+    user = Usuario.query.get_or_404(user_id)
+    if user.tipo_perfil != 'aluno':
+        return redirect("/login")
     aluno = Aluno.query.get_or_404(user_id)  # Obtém o aluno pelo ID da sessão
     return render_template("aluno.html", aluno=aluno)
 
 
 @app.route("/professor", methods=["POST", "GET"])
 def professor():
-    professor_nome = session.get('username')  # Obtém o nome de usuário da sessão
+    if 'user_id' not in session:
+        return redirect("/login")
+    professor_nome = session.get('user_id')  # Obtém o nome de usuário da sessão
+    user = Usuario.query.get_or_404(professor_nome)
+
+    if user.tipo_perfil != 'professor':
+        return redirect("/login")
+    
     if request.method == "POST":
         nome = request.form.get('nome')
-        professor = request.form.get('professor')
         descricao = request.form.get('descricao')
         codigo_acesso = request.form.get('codigo_acesso')
 
@@ -150,6 +164,7 @@ def professor():
             print(f"ERROR: {e}")
             return f"ERROR: {e}"
     else:
+        
         turmas = Turma.query.all()
         return render_template("professor_home.html", turmas=turmas, professor_nome=professor_nome)
 
@@ -263,6 +278,7 @@ def cadastro():
             return redirect("/login")
         novo_aluno = Aluno(username=username, password=password, email=email, matricula=matricula)
         db.session.add(novo_aluno)
+        
     elif tipo_perfil == "professor":
         novo_professor = Professor(username=username, email=email, password=password)
         db.session.add(novo_professor)

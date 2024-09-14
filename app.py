@@ -35,35 +35,31 @@ class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)  # Adicionando a coluna de email
-    tipo_perfil = db.Column(db.String(50), nullable=False)  # Define se é aluno ou professor
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    tipo_perfil = db.Column(db.String(50), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'usuario',
         'polymorphic_on': tipo_perfil
     }
 
-# Classe Aluno herda de Usuario
 class Aluno(Usuario):
     __tablename__ = 'alunos'
     id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
-    matricula = db.Column(db.String(100), nullable=False) # Exemplo de atributo específico de aluno
-    #curso = db.Column(db.String(100), nullable=False) # Curso que o aluno está matriculado
-
+    matricula = db.Column(db.String(100), nullable=False)
+    
     __mapper_args__ = {
-        'polymorphic_identity': 'aluno'
+        'polymorphic_identity': 'aluno',
     }
 
-# Classe Professor herda de Usuario
 class Professor(Usuario):
     __tablename__ = 'professores'
     id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
-    #departamento = db.Column(db.String(100), nullable=False) Exemplo de atributo específico de professor
-    #especializacao = db.Column(db.String(100), nullable=False)  # Área de especialização do professor
-
+    
     __mapper_args__ = {
-        'polymorphic_identity': 'professor'
+        'polymorphic_identity': 'professor',
     }
+
 
 with app.app_context():
     db.create_all()
@@ -113,15 +109,17 @@ def logout():
 
 @app.route("/aluno")
 def aluno():
-    return render_template("aluno.html")
+    aluno_nome = session.get('username')  # Obtém o nome de usuário da sessão
+    return render_template("aluno.html", aluno_nome=aluno_nome)
 
-@app.route("/professor", methods = ["POST","GET"])
+@app.route("/professor", methods=["POST", "GET"])
 def professor():
+    professor_nome = session.get('username')  # Obtém o nome de usuário da sessão
     if request.method == "POST":
         nome = request.form.get('nome')
         professor = request.form.get('professor')
         descricao = request.form.get('descricao')
-        nova_turma = Turma(nome = nome, professor = professor, descricao = descricao)
+        nova_turma = Turma(nome=nome, professor=professor, descricao=descricao)
         try:
             db.session.add(nova_turma)
             db.session.commit()
@@ -131,7 +129,8 @@ def professor():
             return f"ERROR: {e}"
     else:
         turmas = Turma.query.all()
-        return render_template("professor_home.html", turmas = turmas)
+        return render_template("professor_home.html", turmas=turmas, professor_nome=professor_nome)
+
     
 
 #<---------Rotas Auxiliares da Turma---------->
@@ -209,19 +208,15 @@ def edit_turma(id: int):
 @app.route("/cadastro", methods=["POST"])
 def cadastro():
     username = request.form.get("username")
-    email = request.form.get("email")  # Captura o campo de email corretamente
+    email = request.form.get("email")
     password = request.form.get("password")
-    tipo_perfil = request.form.get("tipo_perfil")  # "aluno" ou "professor"
+    tipo_perfil = request.form.get("tipo_perfil")
     
     if tipo_perfil == "aluno":
-        # curso = request.form.get("curso")
         matricula = request.form.get("matricula")
         novo_aluno = Aluno(username=username, password=password, email=email, matricula=matricula)
         db.session.add(novo_aluno)
-    
     elif tipo_perfil == "professor":
-        #departamento = request.form.get("departamento") # 
-        #especializacao = request.form.get("especializacao")
         novo_professor = Professor(username=username, email=email, password=password)
         db.session.add(novo_professor)
 
@@ -231,12 +226,12 @@ def cadastro():
     except Exception as e:
         return f"Erro ao cadastrar: {e}"
 
+
 @app.route("/entrar", methods=["POST"])
 def entrar():
     email = request.form.get("email")
     password = request.form.get("password")
 
-    # Verifica se o usuário é aluno ou professor
     user = Usuario.query.filter_by(email=email, password=password).first()
 
     if user:
@@ -244,10 +239,9 @@ def entrar():
         session['username'] = user.username
         session['tipo_perfil'] = user.tipo_perfil
 
-        # Redireciona com base no perfil do usuário
-        if isinstance(user, Aluno):
+        if user.tipo_perfil == 'aluno':
             return redirect("/aluno")
-        elif isinstance(user, Professor):
+        elif user.tipo_perfil == 'professor':
             return redirect("/professor")
     else:
         return "Usuário ou senha inválidos", 400

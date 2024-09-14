@@ -43,8 +43,9 @@ class Turma(db.Model):
 class Usuario(db.Model):
     __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False)
-    password = db.Column(db.String(100), nullable=False)
+    nome = db.Column(db.String(100), nullable=False)
+    senha = db.Column(db.String(100), nullable=False)
+    matricula = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     tipo_perfil = db.Column(db.String(50), nullable=False)
 
@@ -56,7 +57,6 @@ class Usuario(db.Model):
 class Aluno(Usuario):
     __tablename__ = 'alunos'
     id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
-    matricula = db.Column(db.String(100), nullable=False)
     turmas = db.relationship('Turma', secondary=turma_aluno, backref=db.backref('alunos', lazy='dynamic'))
     
     __mapper_args__ = {
@@ -134,8 +134,6 @@ def aluno():
     if 'user_id' not in session:
         return redirect("/login")
     
-    
-    
     user_id = session.get('user_id')
     user = Usuario.query.get_or_404(user_id)
     if user.tipo_perfil != 'aluno':
@@ -159,7 +157,7 @@ def professor():
         descricao = request.form.get('descricao')
         codigo_acesso = request.form.get('codigo_acesso')
 
-        nova_turma = Turma(nome=nome, professor=professor, descricao=descricao, codigo_acesso=codigo_acesso)
+        nova_turma = Turma(nome=nome, professor=user.nome, descricao=descricao, codigo_acesso=codigo_acesso)
         try:
             db.session.add(nova_turma)
             db.session.commit()
@@ -259,9 +257,10 @@ def edit_turma(id: int):
 #<---------Rotas Auxiliares do Login---------->
 @app.route("/cadastro", methods=["POST"])
 def cadastro():
-    username = request.form.get("username")
+    nome = request.form.get("nome")
     email = request.form.get("email")
-    password = request.form.get("password")
+    matricula = request.form.get("matricula")
+    senha = request.form.get("senha")
     tipo_perfil = request.form.get("tipo_perfil")
     
     # Verificar se o email já existe
@@ -270,21 +269,20 @@ def cadastro():
         return redirect("/login")
 
     # Verificar se o nome de usuário já existe
-    if Usuario.query.filter_by(username=username).first():
+    if Usuario.query.filter_by(nome=nome).first():
         flash("Nome de usuário já cadastrado. Escolha um nome diferente!", "cadastro")
         return redirect("/login")
 
+    if Usuario.query.filter_by(matricula=matricula).first():
+        flash("Matrícula já cadastrada. Tente uma matrícula diferente!", "cadastro")
+        return redirect("/login")
+    
     if tipo_perfil == "aluno":
-        matricula = request.form.get("matricula")
-        # Verificar se a matrícula já existe
-        if Aluno.query.filter_by(matricula=matricula).first():
-            flash("Matrícula já cadastrada. Tente uma matrícula diferente!", "cadastro")
-            return redirect("/login")
-        novo_aluno = Aluno(username=username, password=password, email=email, matricula=matricula)
+        novo_aluno = Aluno(nome=nome, senha=senha, email=email, matricula=matricula)
         db.session.add(novo_aluno)
         
     elif tipo_perfil == "professor":
-        novo_professor = Professor(username=username, email=email, password=password)
+        novo_professor = Professor(nome=nome, email=email, senha=senha, matricula = matricula)
         db.session.add(novo_professor)
 
     try:
@@ -297,13 +295,13 @@ def cadastro():
 @app.route("/entrar", methods=["POST"])
 def entrar():
     email = request.form.get("email")
-    password = request.form.get("password")
+    senha = request.form.get("senha")
 
-    user = Usuario.query.filter_by(email=email, password=password).first()
+    user = Usuario.query.filter_by(email=email, senha=senha).first()
 
     if user:
         session['user_id'] = user.id
-        session['username'] = user.username
+        session['matricula'] = user.matricula
         session['tipo_perfil'] = user.tipo_perfil
 
         if user.tipo_perfil == 'aluno':

@@ -119,6 +119,10 @@ def home():
 def login():
     return render_template("login.html")
 
+@app.route("/register")
+def register():
+    return render_template("cadastro.html")
+
 @app.route("/logout")
 def logout():
     session.clear()  # Limpa todos os dados da sessão

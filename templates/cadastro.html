@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/cadastro.css')}}">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-content" id="aluno-form">
+                <h1>Cadastro de Aluno</h1>
+                <form action="/cadastro" method="POST">
+                    <label for="nome">Nome Completo</label>
+                    <input type="text" id="nome" name="nome" required>
+
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="matricula">Matrícula</label>
+                    <input type="text" id="matricula" name="matricula" required>
+
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" required>
+
+                    <button type="submit">Cadastrar</button>
+                </form>
+            </div>
+            <div class="form-content" id="professor-form" style="display: none;">
+                <h1>Cadastro de Professor</h1>
+                <form action="/cadastro" method="POST">
+                    <label for="nome">Nome Completo</label>
+                    <input type="text" id="nome" name="nome" required>
+
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="matricula">Matrícula</label>
+                    <input type="text" id="matricula" name="matricula" required>
+
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" required>
+
+                    <button type="submit">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+        <div class="toggle-panel">
+            <button id="show-aluno">Cadastrar como Aluno</button>
+            <button id="show-professor">Cadastrar como Professor</button>
+        </div>
+        <div class="login-link">
+            <p>Já tem uma conta? <a href="/login">Faça login</a></p>
+        </div>
+    </div>
+
+    <script src="../static/js/cadastro.js"></script>
+</body>
+</html>

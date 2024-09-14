@@ -60,11 +60,10 @@
             </form>
 
             <div class="conteudos">
-                <h1>Lista de Tarefas</h1>
-
+                <h1>Lista de Tarefas da Turma: {{ turma.nome }}</h1>
                 <ul id="lista_conteudos">
-                {% if tarefas | length < 1 %}
-                    <p id="sem_ctd_msg">Nenhum conteúdo disponível no momento...</p>
+                    {% if tarefas | length < 1 %}
+                        <p id="sem_ctd_msg">Nenhum conteúdo disponível no momento...</p>
                     {% else %}
                         {% for tarefa in tarefas %}
                         <li class="li_conteudos">
@@ -73,7 +72,8 @@
                             </div>
                             <div class="buttons_li">
                                 <a href="/uploads/{{ tarefa.conteudo }}" id="download-btn" download="{{ tarefa.conteudo }}">Baixar</a>
-                                <a href="/edit/{{ tarefa.id }}" id="edit-btn">Editar</a><a href="/delete/{{ tarefa.id }}" id="delete-btn">Excluir</a>
+                                <a href="/edit/{{ tarefa.id }}" id="edit-btn">Editar</a>
+                                <a href="/delete/{{ tarefa.id }}" id="delete-btn">Excluir</a>
                             </div>
                         </li>
                         {% endfor %}

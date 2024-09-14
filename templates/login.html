@@ -27,18 +27,19 @@
             </ul>
 
             <div class="signup">
-                <form>
+                <form action="/cadastro" method="POST">
                     <label for="chk" aria-hidden="true">Criar cadastro</label>
                     <input type="text" name="username" placeholder="Nome de usuário" required="">
                     <input type="number" name="matricula" placeholder="Matrícula (somente números)" required="">
                     <input type="email" name="email" placeholder="Email" required="">
                     <input type="password" name="password" placeholder="Senha" required="">
+                    <input type="hidden" name="tipo_perfil" value="aluno"> <!-- Campo oculto -->
                     <button type="submit">Cadastrar</button>
                 </form>
             </div>
 
             <div class="login">
-                <form>
+                <form action="/entrar" method="POST">
                     <label for="chk" aria-hidden="true">Login</label>
                     <input type="email" name="email" placeholder="Email" required="">
                     <input type="password" name="password" placeholder="Senha" required="">

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, request, send_from_directory
+from flask import Flask, render_template, redirect, request, send_from_directory, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = 'segredo'  # Defina uma chave secreta única
 db = SQLAlchemy(app)
 
 UPLOAD_FOLDER = 'uploads'
@@ -28,6 +29,41 @@ class Turma(db.Model):
 
     def __repr__(self) -> str:
         return f"{self.nome}"
+
+class Usuario(db.Model):
+    __tablename__ = 'usuarios'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)  # Adicionando a coluna de email
+    tipo_perfil = db.Column(db.String(50), nullable=False)  # Define se é aluno ou professor
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'usuario',
+        'polymorphic_on': tipo_perfil
+    }
+
+# Classe Aluno herda de Usuario
+class Aluno(Usuario):
+    __tablename__ = 'alunos'
+    id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
+    matricula = db.Column(db.String(100), nullable=False) # Exemplo de atributo específico de aluno
+    #curso = db.Column(db.String(100), nullable=False) # Curso que o aluno está matriculado
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'aluno'
+    }
+
+# Classe Professor herda de Usuario
+class Professor(Usuario):
+    __tablename__ = 'professores'
+    id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
+    #departamento = db.Column(db.String(100), nullable=False) Exemplo de atributo específico de professor
+    #especializacao = db.Column(db.String(100), nullable=False)  # Área de especialização do professor
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'professor'
+    }
 
 with app.app_context():
     db.create_all()
@@ -162,6 +198,54 @@ def edit_turma(id: int):
     else:
         return render_template("edit_turma.html", turma=turma)
 
+
+#<---------Rotas Auxiliares do Login---------->
+@app.route("/cadastro", methods=["POST"])
+def cadastro():
+    username = request.form.get("username")
+    email = request.form.get("email")  # Captura o campo de email corretamente
+    password = request.form.get("password")
+    tipo_perfil = request.form.get("tipo_perfil")  # "aluno" ou "professor"
+    
+    if tipo_perfil == "aluno":
+        # curso = request.form.get("curso")
+        matricula = request.form.get("matricula")
+        novo_aluno = Aluno(username=username, password=password, email=email, matricula=matricula)
+        db.session.add(novo_aluno)
+    
+    elif tipo_perfil == "professor":
+        #departamento = request.form.get("departamento") # 
+        #especializacao = request.form.get("especializacao")
+        novo_professor = Professor(username=username, email=email, password=password)
+        db.session.add(novo_professor)
+
+    try:
+        db.session.commit()
+        return redirect("/login")
+    except Exception as e:
+        return f"Erro ao cadastrar: {e}"
+
+@app.route("/entrar", methods=["POST"])
+def entrar():
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    # Verifica se o usuário é aluno ou professor
+    user = Usuario.query.filter_by(email=email, password=password).first()
+
+    if user:
+        session['user_id'] = user.id
+        session['username'] = user.username
+        session['tipo_perfil'] = user.tipo_perfil
+
+        # Redireciona com base no perfil do usuário
+        if isinstance(user, Aluno):
+            return redirect("/aluno")
+        elif isinstance(user, Professor):
+            return redirect("/professor")
+    else:
+        return "Usuário ou senha inválidos", 400
+    
 
 if __name__ == "__main__":
 

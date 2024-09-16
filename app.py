@@ -141,7 +141,7 @@ def aluno():
     if user.tipo_perfil != 'aluno':
         return redirect("/login")
     aluno = Aluno.query.get_or_404(user_id)  # Obtém o aluno pelo ID da sessão
-    return render_template("aluno.html", aluno=aluno)
+    return render_template("aluno.html", aluno=aluno, nome=user.nome)
 
 
 @app.route("/professor", methods=["POST", "GET"])

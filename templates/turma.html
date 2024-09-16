@@ -52,10 +52,10 @@
             <div class="criar_tarefa">
                 <h2 id="title_criar_tarefa">Deseja criar uma nova tarefa?</h2>
                 
-                <form id="form_criar_tarefa" action="/turma" method="POST">
+                <form id="form_criar_tarefa" action="/turma/{{ turma.id }}" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="nome_tarefa">Nome da tarefa: </label>
-                        <input type="text" id="nome" name="nome" required>
+                        <input type="text" id="titulo" name="titulo" required>
                     </div>
                     <div class="form-group">
                         <label for="descricao">Descrição da tarefa: </label>
@@ -89,10 +89,10 @@
                         {% for tarefa in tarefas %}
                         <li class="li_conteudos">
                             <div>
-                                <p id="info_conteudo">{{ tarefa.conteudo }} ({{ tarefa.criado.strftime("%d-%m-%Y") }})</p>
+                                <p id="info_conteudo">{{ tarefa.titulo }} ({{ tarefa.criado.strftime("%d-%m-%Y") }})</p>
                             </div>
                             <div class="buttons_li">
-                                <a href="/uploads/{{ tarefa.conteudo }}" id="download-btn" download="{{ tarefa.conteudo }}">Baixar</a>
+                                <a href="/tarefa/{{  tarefa.id  }}" id="download-btn"">Ver</a>
                                 <!-- Mostrar apenas se o usuário for um professor -->
                                 {% if tipo_perfil == 'professor' %}
                                     <a href="/edit/{{ tarefa.id }}" id="edit-btn">Editar</a>

@@ -20,8 +20,9 @@ turma_aluno = db.Table('turma_aluno',
 
 class Tarefa(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    conteudo = db.Column(db.String(100), nullable=False)
-    feito = db.Column(db.Integer, default=0)
+    titulo = db.Column(db.String(100), nullable=False)
+    descricao = db.Column(db.String(100), nullable=False)
+    arquivo = db.Column(db.String(100), nullable=False)
     criado = db.Column(db.DateTime, default=datetime.utcnow)
     turma_id = db.Column(db.Integer, db.ForeignKey('turma.id'), nullable=False)  # Associa tarefa a uma turma específica
     turma = db.relationship('Turma', backref=db.backref('tarefas', lazy=True))
@@ -33,7 +34,6 @@ class Turma(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     professor = db.Column(db.String(100), nullable=False)
-    descricao = db.Column(db.String(100), nullable=False)
     codigo_acesso = db.Column(db.String(20), nullable=False, unique = True)  # Novo campo
 
     def __repr__(self) -> str:
@@ -83,24 +83,32 @@ def turma(turma_id):
     tipo_perfil = session.get('tipo_perfil')
 
     if request.method == "POST":
-        arquivo = request.files.get('conteudo')
+        titulo = request.form.get('titulo')
+        descricao = request.form.get('descricao')
+        arquivo = request.files.get('arquivo')
         
-        if arquivo:
-            nome_arquivo = arquivo.filename
-            
-            # Verificar se o diretório 'uploads' existe, se não, criá-lo
-            caminho_diretorio = 'uploads'
-            if not os.path.exists(caminho_diretorio):
-                os.makedirs(caminho_diretorio)
-            
-            nova_tarefa = Tarefa(conteudo=nome_arquivo, turma_id=turma_id)
+        if titulo and descricao:
+            nome_arquivo = arquivo.filename if arquivo else None
+
+            nova_tarefa = Tarefa(
+                titulo=titulo,
+                descricao=descricao,
+                arquivo=nome_arquivo,
+                turma_id=turma_id
+            )
+
             try:
                 db.session.add(nova_tarefa)
                 db.session.commit()
-                
-                caminho_arquivo = os.path.join(caminho_diretorio, nome_arquivo)
-                arquivo.save(caminho_arquivo)  # Salvar o arquivo no diretório 'uploads'
-                
+
+                # Salvar arquivo se existir
+                if arquivo:
+                    caminho_diretorio = 'uploads'
+                    if not os.path.exists(caminho_diretorio):
+                        os.makedirs(caminho_diretorio)
+                    caminho_arquivo = os.path.join(caminho_diretorio, nome_arquivo)
+                    arquivo.save(caminho_arquivo)
+
                 return redirect(f"/turma/{turma_id}")
             except Exception as e:
                 return f"ERROR: {e}"
@@ -156,7 +164,6 @@ def professor():
     
     if request.method == "POST":
         nome = request.form.get('nome')
-        descricao = request.form.get('descricao')
         codigo_acesso = request.form.get('codigo_acesso')
 
         turma_existente = Turma.query.filter_by(codigo_acesso=codigo_acesso).first()
@@ -166,7 +173,7 @@ def professor():
             flash('O código de acesso já está em uso. Por favor, escolha outro.', 'error')
             return redirect("/professor")
 
-        nova_turma = Turma(nome=nome, professor=user.nome, descricao=descricao, codigo_acesso=codigo_acesso)
+        nova_turma = Turma(nome=nome, professor=user.nome, codigo_acesso=codigo_acesso)
         try:
             db.session.add(nova_turma)
             db.session.commit()
@@ -179,11 +186,10 @@ def professor():
         turmas = Turma.query.all()
         return render_template("professor_home.html", turmas=turmas, nome=user.nome)
 
-@app.route("/tarefa")
-def tarefa():
-    tarefa = Tarefa()
+@app.route("/tarefa/<int:id>")
+def tarefa_detalhes(id: int):
+    tarefa = Tarefa.query.get_or_404(id)
     return render_template("tarefa.html", tarefa=tarefa)
-
 #<---------Rotas Auxiliares da Turma---------->
 
 @app.route("/acessar_turma", methods=["POST"])
@@ -208,7 +214,7 @@ def acessar_turma():
 @app.route("/delete/<int:id>")
 def delete(id: int):
     tarefa = Tarefa.query.get_or_404(id)
-    arquivo_caminho = os.path.join(UPLOAD_FOLDER, tarefa.conteudo)
+    arquivo_caminho = os.path.join(UPLOAD_FOLDER, tarefa.arquivo)
 
     try:
         if os.path.exists(arquivo_caminho):
@@ -224,16 +230,16 @@ def delete(id: int):
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit(id: int):
-    task = Tarefa.query.get_or_404(id)
+    tarefa = Tarefa.query.get_or_404(id)
     if request.method == "POST":
-        task.conteudo = request.form['conteudo']  # Corrigir o nome do campo se necessário
+        tarefa.conteudo = request.form['arquivo']  # Corrigir o nome do campo se necessário
         try:
             db.session.commit()
-            return redirect(f"/turma/{task.turma_id}")
+            return redirect(f"/turma/{tarefa.turma_id}")
         except Exception as e:
             return f"ERROR: {e}"
     else:
-        return render_template("edit.html", task=task)
+        return render_template("edit.html", tarefa=tarefa)
     
 # Rota para download dos arquivos
 @app.route('/uploads/<path:filename>')

@@ -10,13 +10,12 @@
         <div class = "content">
             <hi>Edit your task</hi>
 
-            <form action = "/edit/{{tarefa.id}}" method = "POST">
-                <input 
-                    type="text" 
-                    name="content" 
-                    id="content" 
-                    value = {{task.content}}>
-                <input type="submit" value="Edit">
+            <form method="post" enctype="multipart/form-data">
+                <input type="text" name="titulo" value="{{ tarefa.titulo }}" required>
+                <textarea name="descricao">{{ tarefa.descricao }}</textarea>
+                <input type="file" name="arquivo">
+                <button type="submit">Salvar</button>
+            </form>
         </div>
     </body>
 </html>

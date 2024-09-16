@@ -28,7 +28,7 @@
                             
                         </li>
 
-                        <a href="{% if tipo_perfil == 'professor' %}/professor{% elif tipo_perfil == 'aluno' %}/aluno{% endif %}" id="voltar">
+                        <a href="{% if tipo_perfil == 'professor' %}/turma/{{ turma.id }}{% elif tipo_perfil == 'aluno' %}/turma/{{ turma.id }}{% endif %}" id="voltar">
                             <i class="bi bi-arrow-left-circle"></i>Voltar
                         </a>
 
@@ -51,25 +51,13 @@
             <h2 id="title_section_tarefas">Acesse aqui a(s) sua(s) turma(s):</h2>
         
             <div class="tarefas_lista">
-                <!-- Aqui é onde as tarefas serão listadas dinamicamente -->
-                <ul id="lista_tarefas">
-                {% if tarefas | length < 1 %}
-                    <p id="sem_tarefas_msg">Nenhuma tarefa disponível no momento...</p>
-                    {% else %}
-                        {% for tarefa in tarefas %}
-                            <li class="li_tarefa">
-                                <div>
-                                    <p id="info_tarefa">{{ tarefa.nome }}: Prof. {{tarefa.professor}}</p>
-                                </div>
-                                <div class="buttons_li">
-                                    <a href="/tarefa/{{ tarefa.id }}" id="ver-btn">Ver</a>
-                                    <a href="/edit_tarefa/{{ tarefa.id }}" id="edit-btn">Editar</a><a href="/delete_tarefa/{{ tarefa.id }}" id="delete-btn">Excluir</a>
-                                </div>
-                            </li>
-                        {% endfor %}    
-
-                    {% endif %}
-                </ul>
+                <h1>{{ tarefa.titulo }}</h1>
+                <p>{{ tarefa.descricao }}</p>
+                {% if tarefa.arquivo %}
+                    <a href="{{ url_for('download_arquivo', id=tarefa.id) }}">Baixar arquivo</a>
+                {% else %}
+                    <p>Sem arquivo anexado.</p>
+                {% endif %}
             </div>  
         </div>
 

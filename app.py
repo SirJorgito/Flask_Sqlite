@@ -1,7 +1,9 @@
-import os
-from flask import Flask, render_template, redirect, request, send_from_directory, session, flash, url_for
+from io import BytesIO
+import mimetypes
+from flask import Flask, render_template, redirect, request, session, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import io
 
 app = Flask(__name__)
 
@@ -22,7 +24,8 @@ class Tarefa(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.String(100), nullable=False)
-    arquivo = db.Column(db.String(100), nullable=False)
+    arquivo = db.Column(db.LargeBinary, nullable=True)
+    arquivo_nome = db.Column(db.String(100), nullable=True)  # Armazena o nome original do arquivo
     criado = db.Column(db.DateTime, default=datetime.utcnow)
     turma_id = db.Column(db.Integer, db.ForeignKey('turma.id'), nullable=False)  # Associa tarefa a uma turma específica
     turma = db.relationship('Turma', backref=db.backref('tarefas', lazy=True))
@@ -86,34 +89,28 @@ def turma(turma_id):
         titulo = request.form.get('titulo')
         descricao = request.form.get('descricao')
         arquivo = request.files.get('arquivo')
+
         
         if titulo and descricao:
-            nome_arquivo = arquivo.filename if arquivo else None
+            arquivo_nome = arquivo.filename if arquivo else 'sem_nome'
+            arquivo = arquivo.read() if arquivo else None  # Ler o conteúdo do arquivo
 
             nova_tarefa = Tarefa(
                 titulo=titulo,
                 descricao=descricao,
-                arquivo=nome_arquivo,
+                arquivo=arquivo,
+                arquivo_nome=arquivo_nome,
                 turma_id=turma_id
             )
 
             try:
                 db.session.add(nova_tarefa)
                 db.session.commit()
-
-                # Salvar arquivo se existir
-                if arquivo:
-                    caminho_diretorio = 'uploads'
-                    if not os.path.exists(caminho_diretorio):
-                        os.makedirs(caminho_diretorio)
-                    caminho_arquivo = os.path.join(caminho_diretorio, nome_arquivo)
-                    arquivo.save(caminho_arquivo)
-
                 return redirect(f"/turma/{turma_id}")
             except Exception as e:
                 return f"ERROR: {e}"
         else:
-            return "Nenhum arquivo foi selecionado", 400
+            return "Título ou descrição não fornecidos", 400
     else:
         tarefas = Tarefa.query.filter_by(turma_id=turma_id).order_by(Tarefa.criado).all()
         return render_template("turma.html", tarefas=tarefas, turma=turma, tipo_perfil=tipo_perfil)
@@ -188,8 +185,10 @@ def professor():
 
 @app.route("/tarefa/<int:id>")
 def tarefa_detalhes(id: int):
+    tipo_perfil = session.get('tipo_perfil')
     tarefa = Tarefa.query.get_or_404(id)
-    return render_template("tarefa.html", tarefa=tarefa)
+    turma = tarefa.turma
+    return render_template("tarefa.html", tarefa=tarefa, tipo_perfil=tipo_perfil, turma=turma)
 #<---------Rotas Auxiliares da Turma---------->
 
 @app.route("/acessar_turma", methods=["POST"])
@@ -214,15 +213,13 @@ def acessar_turma():
 @app.route("/delete/<int:id>")
 def delete(id: int):
     tarefa = Tarefa.query.get_or_404(id)
-    arquivo_caminho = os.path.join(UPLOAD_FOLDER, tarefa.arquivo)
 
     try:
-        if os.path.exists(arquivo_caminho):
-            os.remove(arquivo_caminho)
-
+        # Excluir a tarefa do banco de dados
         db.session.delete(tarefa)
         db.session.commit()
-        # Redirecionar para a turma correta
+        
+        # Redirecionar para a turma correta após a exclusão
         return redirect(f"/turma/{tarefa.turma_id}")
     except Exception as e:
         return f"ERROR: {e}"
@@ -231,22 +228,33 @@ def delete(id: int):
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit(id: int):
     tarefa = Tarefa.query.get_or_404(id)
+    
     if request.method == "POST":
-        tarefa.conteudo = request.form['arquivo']  # Corrigir o nome do campo se necessário
-        try:
-            db.session.commit()
-            return redirect(f"/turma/{tarefa.turma_id}")
-        except Exception as e:
-            return f"ERROR: {e}"
+        titulo = request.form.get('titulo')
+        descricao = request.form.get('descricao')
+        arquivo = request.files.get('arquivo')  # Obtenha o arquivo do formulário
+
+        if titulo and descricao:
+            tarefa.titulo = titulo
+            tarefa.descricao = descricao
+
+            if arquivo and arquivo.filename:
+                # Lê o conteúdo do novo arquivo
+                tarefa.arquivo = arquivo.read()
+                tarefa.arquivo_nome = arquivo.filename
+
+            try:
+                db.session.commit()
+                return redirect(f"/turma/{tarefa.turma_id}")
+            except Exception as e:
+                db.session.rollback()  # Reverte qualquer mudança em caso de erro
+                return f"ERROR: {e}"
+        else:
+            return "Título ou descrição não fornecidos", 400
+
     else:
         return render_template("edit.html", tarefa=tarefa)
     
-# Rota para download dos arquivos
-@app.route('/uploads/<path:filename>')
-def download_file(filename):
-    caminho_completo = os.path.abspath(os.path.join(UPLOAD_FOLDER, filename))
-    return send_from_directory(caminho_completo, filename, as_attachment=True)
-
 #<---------Rotas Auxiliares da Turma_Professor---------->
 
 # Rota para excluir uma turma
@@ -268,8 +276,7 @@ def edit_turma(id: int):
     turma = Turma.query.get_or_404(id)
     if request.method == "POST":
         turma.nome = request.form.get('nome')
-        turma.professor = request.form.get('professor')
-        turma.descricao = request.form.get('descricao')
+        turma.codigo_acesso = request.form.get('codigo_acesso')
 
         try:
             db.session.commit()
@@ -337,7 +344,27 @@ def entrar():
     else:
         flash("Usuário ou senha inválidos", "login")
         return redirect("/login")
-    
+#<---------Rotas Auxiliares da Tarefa---------->
+@app.route('/download/<int:id>')
+def download_arquivo(id):
+    tarefa = Tarefa.query.get_or_404(id)
+    if tarefa.arquivo:
+        arquivo_bytes = BytesIO(tarefa.arquivo)
+        arquivo_nome = tarefa.arquivo_nome or 'arquivo_tarefa'  # Nome original do arquivo
+
+        # Determina o tipo MIME com base na extensão do arquivo
+        mimetype, _ = mimetypes.guess_type(arquivo_nome)
+        mimetype = mimetype or 'application/octet-stream'
+
+        return send_file(
+            arquivo_bytes,
+            download_name=arquivo_nome,  # Nome do arquivo para download
+            mimetype=mimetype,  # Tipo MIME do arquivo
+            as_attachment=True
+        )
+    else:
+        return "Arquivo não encontrado", 404
+
 
 if __name__ == "__main__":
 

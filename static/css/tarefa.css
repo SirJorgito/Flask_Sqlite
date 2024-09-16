@@ -1,5 +1,18 @@
 @import url('./home.css');
 
+#voltar {
+    color: inherit;
+    font-size: 3rem;
+    transition: 0.5s;
+    margin-right: 5.5rem;
+    text-decoration: none;
+}
+
+#voltar:hover {
+    transform: scale(1.05);
+    transition: 0.5s;
+}
+
 .section_painel{
     display: flex;
     flex-direction: column;
@@ -114,112 +127,24 @@
 
 .tarefas_lista {
     display: flex;
+    flex-direction: column;
     justify-items: center;
     align-items: center;
     text-align: center;
-}
-
-#lista_tarefas {
-    display: flex;
-    flex-direction: column;
-    list-style-type: none;
-    width: 100vh;
-    align-items:center;
-    font-size: 18px;
-}
-
-#lista_tarefas li {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
-    padding: 1rem;
-    border-radius: 5px;
-    background-color: beige;
     width: 100%;
-    transition: 0.5s;
-    cursor: pointer;
 }
 
-#lista_tarefas li:hover {
-    background-color: rgb(220, 220, 198);
-    transition: 0.5s;
+.tarefas_lista h1 {
+    font-size: 40px;
+    margin-bottom: 1.5rem;
 }
 
-#lista_tarefas a{
-    text-decoration: none;
-    color: inherit;
+#descricao_tarefa {
+    font-size: 25px;
+    margin-bottom: 1.5rem;
 }
 
-.li_turma {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    color: rgb(234, 234, 234);
-}
-
-#info_turma {
-    color: var(--cor-texto);
-}
-
-.buttons_li a{
-    margin-right: 1rem;
-}
-
-#ver-btn{
-    border: 1px solid var(--cor-destaque);
-    border-radius: 8px;
-    padding: 0.2rem 1rem;
-    background-color: var(--cor-destaque);
-}
-
-#edit-btn{
-    border: 1px solid rgb(0, 135, 224);
-    border-radius: 8px;
-    padding: 0.2rem 1rem;
-    background-color: rgb(0, 135, 224);
-}
-
-#delete-btn{
-    border: 1px solid rgb(222, 0, 0);
-    border-radius: 8px;
-    padding: 0.2rem 1rem;
-    background-color: rgb(222, 0, 0);
-}
-
-/* Estilo do botão de upload */
-#form-upload {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1rem 0;
-    width: 80%;
-}
-
-.custom-file-upload {
-    padding: 10px 20px;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
-    transition: background-color 0.3s ease;
-    margin-right: 10px;
-    transform: scale(1.1);
-    width: 25%;
-    text-align: center;
-}
-
-.custom-file-upload:hover {
-    background-color: #0056b3;
-}
-
-/* Oculte o input de arquivo padrão */
-input[type="file"] {
-    display: none;
-}
-
-#btn_add {
+#button {
     padding: 10px 20px;
     background-color: #28a745;
     color: white;
@@ -228,15 +153,6 @@ input[type="file"] {
     cursor: pointer;
     transform: scale(1.2);
     margin-left: 1.5rem;
-}
-
-#btn_add:hover {
-    background-color: #218838;
-}
-
-#file-selected-msg {
-    font-size: 20px;
-    color: green;
-    margin-top: 10px;
-    margin-left: 1rem;
+    text-decoration: none;
+    width: 20%;
 }

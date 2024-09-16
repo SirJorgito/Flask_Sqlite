@@ -228,6 +228,7 @@ def delete(id: int):
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit(id: int):
     tarefa = Tarefa.query.get_or_404(id)
+    turma = Turma.query.get_or_404(id)
     
     if request.method == "POST":
         titulo = request.form.get('titulo')
@@ -253,7 +254,7 @@ def edit(id: int):
             return "Título ou descrição não fornecidos", 400
 
     else:
-        return render_template("edit.html", tarefa=tarefa)
+        return render_template("edit.html", tarefa=tarefa, turma=turma)
     
 #<---------Rotas Auxiliares da Turma_Professor---------->
 

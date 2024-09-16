@@ -3,19 +3,80 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel = "stylesheet" href = {{url_for('static', filename = "styles.css")}}/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="{{url_for('static', filename = 'css/styles.css')}}"/>
+
+        <script src="../../static/js/tarefa.js"></script>
         
     </head>
     <body>
-        <div class = "content">
-            <hi>Edit your task</hi>
+        <header class="cabecalho">
+            <div class="container">
+                <div id="container_icons">
+                    <nav>
+                        <ul class="ul-icons">
+                            <li class="icons_header dropdown">
+                                <i class="bi bi-person-circle" id="profile-icon"></i>
+    
+                                <div id="profile-menu" class="dropdown-menu">
+                                    <a href=""><i class="bi bi-pencil-square"></i>Editar perfil</a>
+                                    <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-left"></i>Desconectar</a>
+                                </div>
+                                
+                            </li>
+    
+                            <a href="{% if tipo_perfil == 'professor' %}/turma/{{ turma.id }}{% endif %}" id="voltar">
+                                <i class="bi bi-arrow-left-circle"></i>Voltar
+                            </a>
+    
+                        </ul>
+                    </nav>
+                </div>
+    
+                <ul class="ul-menu">
+                    <div class="div_title_header">
+                        <h1 id="title_header">SALA VIRTUAL</h1>
+                    </div>
+                </ul>
+    
+            </div>
+        </header>
+        
+        <div class="criar_tarefa">
+            
+            <form id="form_criar_tarefa" action="/turma/{{ turma.id }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="nome_tarefa">Novo nome da tarefa: </label>
+                    <input type="text" id="titulo" name="titulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Nova descrição da tarefa: </label>
+                    <textarea id="descricao" name="descricao"></textarea>
+                </div>
 
-            <form method="post" enctype="multipart/form-data">
-                <input type="text" name="titulo" value="{{ tarefa.titulo }}" required>
-                <textarea name="descricao">{{ tarefa.descricao }}</textarea>
-                <input type="file" name="arquivo">
-                <button type="submit">Salvar</button>
+
+                <div class="form-group">
+                        <label class="custom-file-upload">
+                            <i class="bi bi-cloud-upload"></i> Escolher novo arquivo
+                        </label>
+                
+                        <input type="file" name="arquivo" id="arquivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.png,.zip,.rar" required hidden />
+                        
+                        <p id="file-selected-msg" style="display: none;">Arquivo selecionado: <span id="file-name"></span></p>
+                </div>
+
+
+                <div id="button">
+                    <button id="button_forms" type="submit">Editar tarefa</button>
+                </div>
             </form>
         </div>
+
+        <footer>
+            <div id="div_footer">
+                <p>SALA VIRTUAL</p>
+                <p id="p_footer">Desenvolvido por Gustavo Oki e Jorge Henrique Lessa</p>
+            </div>
+        </footer>
     </body>
 </html>

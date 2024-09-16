@@ -5,6 +5,7 @@
     font-size: 3rem;
     transition: 0.5s;
     margin-right: 5.5rem;
+    text-decoration: none;
 }
 
 #voltar:hover {

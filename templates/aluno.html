@@ -59,7 +59,7 @@
                                     <p id="info_turma">{{ turma.nome }} - Professor: {{ turma.professor }}</p>
                                 </div>
                                 <div class="buttons_li">
-                                    <a href="/turma/{{ turma.id }}" id="ver-btn">Ver</a>
+                                    <a href="{{ url_for('turma', turma_id=turma.id) }}" id="ver-btn">Ver</a>
                                 </div>
                             </li>
                         {% endfor %}

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, request, send_from_directory, session, flash
+from flask import Flask, render_template, redirect, request, send_from_directory, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -34,7 +34,7 @@ class Turma(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     professor = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.String(100), nullable=False)
-    codigo_acesso = db.Column(db.String(20), nullable=False)  # Novo campo
+    codigo_acesso = db.Column(db.String(20), nullable=False, unique = True)  # Novo campo
 
     def __repr__(self) -> str:
         return f"{self.nome}"
@@ -80,6 +80,8 @@ with app.app_context():
 @app.route("/turma/<int:turma_id>", methods=["POST", "GET"])
 def turma(turma_id):
     turma = Turma.query.get_or_404(turma_id)  # Carregar a turma pelo ID
+    tipo_perfil = session.get('tipo_perfil')
+
     if request.method == "POST":
         arquivo = request.files.get('conteudo')
         
@@ -106,7 +108,7 @@ def turma(turma_id):
             return "Nenhum arquivo foi selecionado", 400
     else:
         tarefas = Tarefa.query.filter_by(turma_id=turma_id).order_by(Tarefa.criado).all()
-        return render_template("turma.html", tarefas=tarefas, turma=turma)
+        return render_template("turma.html", tarefas=tarefas, turma=turma, tipo_perfil=tipo_perfil)
 
 
 
@@ -157,6 +159,13 @@ def professor():
         descricao = request.form.get('descricao')
         codigo_acesso = request.form.get('codigo_acesso')
 
+        turma_existente = Turma.query.filter_by(codigo_acesso=codigo_acesso).first()
+
+        if turma_existente:
+            # Retorna uma mensagem de erro se o código já existir
+            flash('O código de acesso já está em uso. Por favor, escolha outro.', 'error')
+            return redirect("/professor")
+
         nova_turma = Turma(nome=nome, professor=user.nome, descricao=descricao, codigo_acesso=codigo_acesso)
         try:
             db.session.add(nova_turma)
@@ -168,7 +177,7 @@ def professor():
     else:
         
         turmas = Turma.query.all()
-        return render_template("professor_home.html", turmas=turmas, professor_nome=professor_nome)
+        return render_template("professor_home.html", turmas=turmas, nome=user.nome)
 
     
 
@@ -180,7 +189,15 @@ def acessar_turma():
     turma = Turma.query.filter_by(codigo_acesso=codigo_acesso).first()
 
     if turma:
-        return redirect(f"/turma/{turma.id}")  # Redireciona para a página da turma com o ID correto
+         # Verificar se o aluno já está na turma
+        user_id = session.get('user_id')
+        aluno = Aluno.query.get(user_id)
+        
+        if aluno not in turma.alunos:
+            turma.alunos.append(aluno)
+            db.session.commit()
+        
+        return redirect(f"/aluno")
     else:
         flash("Código de turma inválido", "turma")
         return redirect("/aluno")

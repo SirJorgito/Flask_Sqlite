@@ -28,7 +28,9 @@
                             
                         </li>
 
-                        <a href="/professor" id="voltar"><i class="bi bi-arrow-left-circle"></i></a>
+                        <a href="{% if tipo_perfil == 'professor' %}/professor{% elif tipo_perfil == 'aluno' %}/aluno{% endif %}" id="voltar">
+                            <i class="bi bi-arrow-left-circle"></i> Voltar
+                        </a>
 
                     </ul>
                 </nav>
@@ -45,7 +47,7 @@
 
     <section class="section_painel">
         <div class="painel">
-
+            {% if tipo_perfil == 'professor' %}
             <!-- Formulário para adicionar nova tarefa -->
             <form id="form-upload" enctype="multipart/form-data" action="/turma/{{ turma.id }}" method="POST">
                 <label for="conteudo" class="custom-file-upload">
@@ -58,7 +60,7 @@
                 
                 <button type="submit" value="Adicionar Tarefa" id="btn_add">Enviar</button>
             </form>
-
+            {% endif %}
             <div class="conteudos">
                 <h1>Lista de Tarefas da Turma: {{ turma.nome }}</h1>
                 <ul id="lista_conteudos">
@@ -72,8 +74,11 @@
                             </div>
                             <div class="buttons_li">
                                 <a href="/uploads/{{ tarefa.conteudo }}" id="download-btn" download="{{ tarefa.conteudo }}">Baixar</a>
-                                <a href="/edit/{{ tarefa.id }}" id="edit-btn">Editar</a>
-                                <a href="/delete/{{ tarefa.id }}" id="delete-btn">Excluir</a>
+                                <!-- Mostrar apenas se o usuário for um professor -->
+                                {% if tipo_perfil == 'professor' %}
+                                    <a href="/edit/{{ tarefa.id }}" id="edit-btn">Editar</a>
+                                    <a href="/delete/{{ tarefa.id }}" id="delete-btn">Excluir</a>
+                                {% endif %}
                             </div>
                         </li>
                         {% endfor %}

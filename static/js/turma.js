@@ -1,8 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const fileUpload = document.getElementById('conteudo');
+    const fileUpload = document.getElementById('arquivo'); // Alterado para o ID correto
     const fileSelectedMsg = document.getElementById('file-selected-msg');
     const fileNameDisplay = document.getElementById('file-name');
     const btnEnviar = document.getElementById('btn_add');
+    const customFileUpload = document.querySelector('.custom-file-upload'); // Botão estilizado
+
+    // Simula o clique no input de arquivo quando o botão estilizado for clicado
+    customFileUpload.addEventListener('click', function(event) {
+        event.preventDefault(); // Previne comportamento padrão
+        fileUpload.click();
+    });
 
     // Exibe mensagem quando um arquivo for selecionado
     fileUpload.addEventListener('change', function() {
@@ -14,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fileSelectedMsg.style.display = 'none'; // Esconde a mensagem
         }
     });
-
 
     // Função de envio de arquivo
     btnEnviar.addEventListener('click', function() {

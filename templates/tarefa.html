@@ -73,38 +73,6 @@
             </div>  
         </div>
 
-        <div class="criar_tarefa">
-            <h2 id="title_criar_tarefa">Deseja criar uma nova tarefa?</h2>
-            
-            <form id="form_criar_tarefa" action="/professor" method="POST">
-                <div class="form-group">
-                    <label for="nome_tarefa">Nome da tarefa: </label>
-                    <input type="text" id="nome" name="nome" required>
-                </div>
-                <div class="form-group">
-                    <label for="descricao">Descrição da tarefa: </label>
-                    <textarea id="descricao" name="descricao"></textarea>
-                </div>
-
-
-                <div class="form-group">
-                    <form id="form-upload" enctype="multipart/form-data" action="/tarefa/{{ tarefa.id }}" method="POST">
-                        <label class="custom-file-upload">
-                            <i class="bi bi-cloud-upload"></i> Escolher arquivo
-                        </label>
-                
-                        <input type="file" name="arquivo" id="arquivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.png,.zip,.rar" required hidden />
-                        
-                        <p id="file-selected-msg" style="display: none;">Arquivo selecionado: <span id="file-name"></span></p>
-                    </form>
-                </div>
-
-
-                <div id="button">
-                    <button id="button_forms" type="submit">Criar tarefa</button>
-                </div>
-            </form>
-        </div>
     </section>    
 
     <footer>

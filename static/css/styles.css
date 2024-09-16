@@ -284,3 +284,9 @@
     align-items: center;
     text-align: center;
 }
+
+/* STYLE EDITAR TAREFA */
+.container_criar {
+    display: flex;
+    justify-content: center;
+}

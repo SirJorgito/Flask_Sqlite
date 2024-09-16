@@ -1,3 +1,2 @@
 venv/
-instance/
-uploads/
+instance/database.db

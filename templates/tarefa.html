@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefa</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="{{url_for('static', filename = 'css/tarefa.css')}}"/>
+
+    <script src="../../static/js/tarefa.js"></script>
+</head>
+<body>
+    <header class="cabecalho">
+        <div class="container">
+            <div id="container_icons">
+                <nav>
+                    <ul class="ul-icons">
+                        <li class="icons_header dropdown">
+                            <i class="bi bi-person-circle" id="profile-icon"></i>
+
+                            <div id="profile-menu" class="dropdown-menu">
+                                <a href=""><i class="bi bi-pencil-square"></i>Editar perfil</a>
+                                <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-left"></i>Desconectar</a>
+                            </div>
+                            
+                        </li>
+
+                        <a href="{% if tipo_perfil == 'professor' %}/professor{% elif tipo_perfil == 'aluno' %}/aluno{% endif %}" id="voltar">
+                            <i class="bi bi-arrow-left-circle"></i>Voltar
+                        </a>
+
+                    </ul>
+                </nav>
+            </div>
+
+            <ul class="ul-menu">
+                <div class="div_title_header">
+                    <h1 id="title_header">SALA VIRTUAL</h1>
+                </div>
+            </ul>
+
+        </div>
+    </header>
+
+    <section class="section_painel">
+
+        <div class="div_tarefas">
+            <h2 id="title_section_tarefas">Acesse aqui a(s) sua(s) turma(s):</h2>
+        
+            <div class="tarefas_lista">
+                <!-- Aqui é onde as tarefas serão listadas dinamicamente -->
+                <ul id="lista_tarefas">
+                {% if tarefas | length < 1 %}
+                    <p id="sem_tarefas_msg">Nenhuma tarefa disponível no momento...</p>
+                    {% else %}
+                        {% for tarefa in tarefas %}
+                            <li class="li_tarefa">
+                                <div>
+                                    <p id="info_tarefa">{{ tarefa.nome }}: Prof. {{tarefa.professor}}</p>
+                                </div>
+                                <div class="buttons_li">
+                                    <a href="/tarefa/{{ tarefa.id }}" id="ver-btn">Ver</a>
+                                    <a href="/edit_tarefa/{{ tarefa.id }}" id="edit-btn">Editar</a><a href="/delete_tarefa/{{ tarefa.id }}" id="delete-btn">Excluir</a>
+                                </div>
+                            </li>
+                        {% endfor %}    
+
+                    {% endif %}
+                </ul>
+            </div>  
+        </div>
+
+        <div class="criar_tarefa">
+            <h2 id="title_criar_tarefa">Deseja criar uma nova tarefa?</h2>
+            
+            <form id="form_criar_tarefa" action="/professor" method="POST">
+                <div class="form-group">
+                    <label for="nome_tarefa">Nome da tarefa: </label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição da tarefa: </label>
+                    <textarea id="descricao" name="descricao"></textarea>
+                </div>
+
+
+                <div class="form-group">
+                    <form id="form-upload" enctype="multipart/form-data" action="/tarefa/{{ tarefa.id }}" method="POST">
+                        <label class="custom-file-upload">
+                            <i class="bi bi-cloud-upload"></i> Escolher arquivo
+                        </label>
+                
+                        <input type="file" name="arquivo" id="arquivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.png,.zip,.rar" required hidden />
+                        
+                        <p id="file-selected-msg" style="display: none;">Arquivo selecionado: <span id="file-name"></span></p>
+                    </form>
+                </div>
+
+
+                <div id="button">
+                    <button id="button_forms" type="submit">Criar tarefa</button>
+                </div>
+            </form>
+        </div>
+    </section>    
+
+    <footer>
+        <div id="div_footer">
+            <p>SALA VIRTUAL</p>
+            <p id="p_footer">Desenvolvido por Gustavo Oki e Jorge Henrique Lessa</p>
+        </div>
+    </footer>
+</body>
+</html>

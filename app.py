@@ -179,7 +179,10 @@ def professor():
         turmas = Turma.query.all()
         return render_template("professor_home.html", turmas=turmas, nome=user.nome)
 
-    
+@app.route("/tarefa")
+def tarefa():
+    tarefa = Tarefa()
+    return render_template("tarefa.html", tarefa=tarefa)
 
 #<---------Rotas Auxiliares da Turma---------->
 

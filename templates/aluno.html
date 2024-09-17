@@ -56,10 +56,10 @@
                         {% for turma in aluno.turmas %}
                             <li class="li_turma">
                                 <div>
-                                    <p id="info_turma">{{ turma.nome }} - Professor: {{ turma.professor }}</p>
+                                    <p id="info_turma"></p>
                                 </div>
                                 <div class="buttons_li">
-                                    <a href="{{ url_for('turma', turma_id=turma.id) }}" id="ver-btn">Ver</a>
+                                    <a href="{{ url_for('turma', turma_id=turma.id) }}" id="ver-btn">{{ turma.nome }} - Professor: {{ turma.professor }}</a>
                                 </div>
                             </li>
                         {% endfor %}

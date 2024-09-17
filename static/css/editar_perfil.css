@@ -1,0 +1,65 @@
+@import url(./styles.css);
+
+.container_editar_perfil{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.container_info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    margin-bottom: 1.5rem;
+}
+
+.container_info h1 {
+    font-size: 40px;
+    margin-bottom: 0.5rem;
+}
+
+.container_info p {
+    font-size: 20px;
+}
+
+.div_form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70%;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    padding: 1.5rem;
+}
+
+.div_form form label {
+    font-size: 20px;
+}
+
+.div_form form input {
+    padding-left: 1rem;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    margin-bottom: 1.5rem;
+    font-size: 15px;
+    width: 100%;
+    text-align: start;
+}
+
+.div_form button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transform: scale(1.2);
+    margin-left: 1.5rem;
+    transition: 0.5s;
+}
+
+.div_form button:hover {
+    background-color: #218838;
+    transition: 0.5s;
+}

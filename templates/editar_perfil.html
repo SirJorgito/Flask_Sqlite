@@ -3,22 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar Perfil</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style-padrao.css') }}">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editar_perfil.css') }}">
 </head>
 <body>
-    <h1>Editar Perfil</h1>
-    <form action="{{ url_for('editar_perfil', id=usuario.id) }}" method="post">
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" name="nome" value="{{ usuario.nome }}" required><br>
+    <header class="cabecalho">
+        <div class="container">
+            <div id="container_icons">
+                <nav>
+                    <ul class="ul-icons">
+                        <li class="icons_header dropdown">
+                            <i class="bi bi-person-circle" id="profile-icon"></i>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="{{ usuario.email }}" required><br>
+                            <div id="profile-menu" class="dropdown-menu">
+                                <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-left"></i>Desconectar</a>
+                            </div>
+                            
+                        </li>
 
-        <label for="senha">Senha:</label>
-        <input type="password" id="senha" name="senha"><br>
+                    </ul>
+                </nav>
+            </div>
 
-        <button type="submit">Atualizar Perfil</button>
-    </form>
+            <ul class="ul-menu">
+                <div class="div_title_header">
+                    <h1 id="title_header">SALA VIRTUAL</h1>
+                </div>
+            </ul>
 
+        </div>
+    </header>
+
+    <section class="container_editar_perfil">
+        <div class="container_info">
+            <h1>Editar Perfil</h1>
+            <p>Caso não queira editar algum tópico, apenas deixe-o como está e clique em "Atualizar perfil".</p>
+        </div>
+        
+        <div class="div_form">
+            <form action="{{ url_for('editar_perfil', id=usuario.id) }}" method="post">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" value="{{ usuario.nome }}" required><br>
+    
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ usuario.email }}" required><br>
+    
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha"><br>
+    
+                <button type="submit">Atualizar Perfil</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div id="div_footer">
+            <p>SALA VIRTUAL</p>
+            <p id="p_footer">Desenvolvido por Gustavo Oki e Jorge Henrique Lessa</p>
+        </div>
+    </footer>
 </body>
 </html>

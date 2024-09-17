@@ -25,7 +25,7 @@
                                 
                             </li>
     
-                            <a href="{% if tipo_perfil == 'professor' %}/turma/{{ turma.id }}{% endif %}" id="voltar">
+                            <a href="/turma/{{turma.id}}" id="voltar">
                                 <i class="bi bi-arrow-left-circle"></i>Voltar
                             </a>
     
@@ -45,7 +45,7 @@
         <div class="container_criar">
             <div class="criar_tarefa">
             
-                <form id="form_criar_tarefa" action="/turma/{{ turma.id }}" method="POST" enctype="multipart/form-data">
+                <form id="form_criar_tarefa" action="/edit/{{tarefa.id}}" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="nome_tarefa">Novo nome da tarefa: </label>
                         <input type="text" id="titulo" name="titulo" required>

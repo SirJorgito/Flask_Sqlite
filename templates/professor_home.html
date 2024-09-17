@@ -24,7 +24,7 @@
                             <i class="bi bi-person-circle" id="profile-icon"></i>
 
                             <div id="profile-menu" class="dropdown-menu">
-                                <a href=""><i class="bi bi-pencil-square"></i>Editar perfil</a>
+                                <a href="/editar_perfil/{{user.id}}"><i class="bi bi-pencil-square"></i>Editar perfil</a>
                                 <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-left"></i>Desconectar</a>
                             </div>
                         </li>
@@ -43,7 +43,7 @@
     </header>
 
     <section class="section_menu">
-        <h2 class="title_user_section">Olá, Prof. {{ nome }}!</h2>
+        <h2 class="title_user_section">Olá, Prof. {{ user.nome }}!</h2>
 
 
         <div class="div_turmas">
@@ -76,7 +76,7 @@
         <div class="criar_turma">
             <h2 id="title_criar_turma">Deseja criar uma nova turma?</h2>
             
-            <form id="form_criar_turma" action="/professor" method="POST">
+            <form id="form_criar_turma" action="/professor/{{user.id}}" method="POST">
                 <div class="form-group">
                     <label for="nome_turma">Nome da Turma: </label>
                     <input type="text" id="nome" name="nome" required>

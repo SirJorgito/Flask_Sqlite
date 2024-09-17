@@ -28,7 +28,7 @@
                             
                         </li>
 
-                        <a href="{% if tipo_perfil == 'professor' %}/professor{% elif tipo_perfil == 'aluno' %}/aluno{% endif %}" id="voltar">
+                        <a href="{% if tipo_perfil == 'professor' %}/professor/{{user.id}}{% elif tipo_perfil == 'aluno' %}/aluno/{{user.id}}{% endif %}" id="voltar">
                             <i class="bi bi-arrow-left-circle"></i>Voltar
                         </a>
 

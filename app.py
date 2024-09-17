@@ -84,7 +84,8 @@ with app.app_context():
 def turma(turma_id):
     turma = Turma.query.get_or_404(turma_id)  # Carregar a turma pelo ID
     tipo_perfil = session.get('tipo_perfil')
-
+    user_id = session.get('user_id')
+    user = Usuario.query.get_or_404(user_id)
     if request.method == "POST":
         titulo = request.form.get('titulo')
         descricao = request.form.get('descricao')
@@ -113,7 +114,7 @@ def turma(turma_id):
             return "Título ou descrição não fornecidos", 400
     else:
         tarefas = Tarefa.query.filter_by(turma_id=turma_id).order_by(Tarefa.criado).all()
-        return render_template("turma.html", tarefas=tarefas, turma=turma, tipo_perfil=tipo_perfil)
+        return render_template("turma.html", tarefas=tarefas, turma=turma, tipo_perfil=tipo_perfil, user=user)
 
 
 
@@ -136,25 +137,24 @@ def logout():
     return redirect("/home")
 
 
-@app.route("/aluno")
-def aluno():
+@app.route("/aluno/<int:id>")
+def aluno(id: int):
+    if 'user_id' not in session:
+        return redirect("/login")
+    user_id = session.get('user_id')
+    user = Usuario.query.get_or_404(user_id) 
+    if user.tipo_perfil != 'aluno' or user.id != id:
+        return redirect("/login")
+    return render_template("aluno.html", aluno=user, user=user)
+
+
+@app.route("/professor/<int:id>", methods=["POST", "GET"])
+def professor(id: int):
     if 'user_id' not in session:
         return redirect("/login")
     
     user_id = session.get('user_id')
     user = Usuario.query.get_or_404(user_id)
-    if user.tipo_perfil != 'aluno':
-        return redirect("/login")
-    aluno = Aluno.query.get_or_404(user_id)  # Obtém o aluno pelo ID da sessão
-    return render_template("aluno.html", aluno=aluno, nome=user.nome)
-
-
-@app.route("/professor", methods=["POST", "GET"])
-def professor():
-    if 'user_id' not in session:
-        return redirect("/login")
-    professor_nome = session.get('user_id')  # Obtém o nome de usuário da sessão
-    user = Usuario.query.get_or_404(professor_nome)
 
     if user.tipo_perfil != 'professor':
         return redirect("/login")
@@ -168,20 +168,20 @@ def professor():
         if turma_existente:
             # Retorna uma mensagem de erro se o código já existir
             flash('O código de acesso já está em uso. Por favor, escolha outro.', 'error')
-            return redirect("/professor")
+            return redirect(f"/professor/{id}")
 
         nova_turma = Turma(nome=nome, professor=user.nome, codigo_acesso=codigo_acesso)
         try:
             db.session.add(nova_turma)
             db.session.commit()
-            return redirect("/professor")
+            return redirect(f"/professor/{id}")
         except Exception as e:
             print(f"ERROR: {e}")
             return f"ERROR: {e}"
     else:
         
-        turmas = Turma.query.all()
-        return render_template("professor_home.html", turmas=turmas, nome=user.nome)
+        turmas = Turma.query.filter_by(professor=user.nome).all()
+        return render_template("professor_home.html", turmas=turmas, user=user)
 
 @app.route("/tarefa/<int:id>")
 def tarefa_detalhes(id: int):
@@ -189,30 +189,68 @@ def tarefa_detalhes(id: int):
     tarefa = Tarefa.query.get_or_404(id)
     turma = tarefa.turma
     return render_template("tarefa.html", tarefa=tarefa, tipo_perfil=tipo_perfil, turma=turma)
+
+@app.route("/editar_perfil/<int:id>", methods=["GET", "POST"])
+def editar_perfil(id: int):
+    if 'user_id' not in session:
+        return redirect("/login")
+
+    user_id = session.get('user_id')
+    usuario = Usuario.query.get_or_404(id)
+
+    # Verifica se o usuário na sessão é o mesmo que o ID fornecido
+    if usuario.id != user_id:
+        flash("Você não tem permissão para editar este perfil.", "error")
+        return redirect("/")
+
+    if request.method == "POST":
+        nome = request.form.get('nome')
+        email = request.form.get('email')
+        senha = request.form.get('senha')
+
+        # Atualiza os campos do usuário
+        usuario.nome = nome
+        usuario.email = email
+        if senha:  # Permite atualização de senha apenas se um novo valor for fornecido
+            usuario.senha = senha
+
+        try:
+            db.session.commit()
+            flash("Perfil atualizado com sucesso!", "success")
+            return redirect(f"/{usuario.tipo_perfil}/{usuario.id}")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao atualizar perfil: {e}", "error")
+            return redirect(f"/editar_perfil/{id}")
+    else:
+        return render_template("editar_perfil.html", usuario=usuario)
+
 #<---------Rotas Auxiliares da Turma---------->
 
 @app.route("/acessar_turma", methods=["POST"])
 def acessar_turma():
     codigo_acesso = request.form.get('codigo_turma')
     turma = Turma.query.filter_by(codigo_acesso=codigo_acesso).first()
-
+    user_id = session.get('user_id')
+    aluno = Aluno.query.get(user_id)
     if turma:
          # Verificar se o aluno já está na turma
-        user_id = session.get('user_id')
-        aluno = Aluno.query.get(user_id)
-        
         if aluno not in turma.alunos:
             turma.alunos.append(aluno)
             db.session.commit()
         
-        return redirect(f"/aluno")
+        return redirect(f"/aluno/{aluno.id}")
     else:
         flash("Código de turma inválido", "turma")
-        return redirect("/aluno")
+        return redirect(f"/aluno/{aluno.id}")
 
 @app.route("/delete/<int:id>")
 def delete(id: int):
     tarefa = Tarefa.query.get_or_404(id)
+
+    if session.get('tipo_perfil') != 'professor':
+        flash('Acesso negado. Apenas professores podem deletar tarefas.', 'error')
+        return redirect(f"/turma/{tarefa.turma_id}")
 
     try:
         # Excluir a tarefa do banco de dados
@@ -228,7 +266,9 @@ def delete(id: int):
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit(id: int):
     tarefa = Tarefa.query.get_or_404(id)
-    turma = Turma.query.get_or_404(id)
+    if session.get('tipo_perfil') != 'professor':
+        flash('Acesso negado. Apenas professores podem editar tarefas.', 'error')
+        return redirect(f"/turma/{tarefa.turma_id}")
     
     if request.method == "POST":
         titulo = request.form.get('titulo')
@@ -254,6 +294,7 @@ def edit(id: int):
             return "Título ou descrição não fornecidos", 400
 
     else:
+        turma = Turma.query.get_or_404(id)
         return render_template("edit.html", tarefa=tarefa, turma=turma)
     
 #<---------Rotas Auxiliares da Turma_Professor---------->
@@ -262,12 +303,16 @@ def edit(id: int):
 @app.route("/delete_turma/<int:id>")
 def delete_turma(id: int):
     turma = Turma.query.get_or_404(id)
+    if session.get('tipo_perfil') != 'professor':
+        flash('Acesso negado. Apenas professores podem excluir tarefas.', 'error')
+        return redirect(f"/turma/{turma.id}")
 
     try:
         # Remover a turma do banco de dados
         db.session.delete(turma)
         db.session.commit()
-        return redirect("/professor")
+        professor_id = session.get('user_id')
+        return redirect(f"/professor/{professor_id}")
     except Exception as e:
         return f"ERROR: {e}"
 
@@ -275,17 +320,27 @@ def delete_turma(id: int):
 @app.route("/edit_turma/<int:id>", methods=["GET", "POST"])
 def edit_turma(id: int):
     turma = Turma.query.get_or_404(id)
+    if session.get('tipo_perfil') != 'professor':
+        flash('Acesso negado. Apenas professores podem editar tarefas.', 'error')
+        return redirect(f"/turma/{turma.turma_id}")
+    
+    # Recupera o ID do usuário da sessão
+    user_id = session.get('user_id')
+    
+    # Recupera o usuário do banco de dados, caso necessário
+    user = Usuario.query.get(user_id)
+
     if request.method == "POST":
         turma.nome = request.form.get('nome')
         turma.codigo_acesso = request.form.get('codigo_acesso')
 
         try:
             db.session.commit()
-            return redirect("/professor")
+            return redirect(f"/professor/{user.id}")
         except Exception as e:
             return f"ERROR: {e}"
     else:
-        return render_template("edit_turma.html", turma=turma)
+        return render_template("edit_turma.html", turma=turma, user=user)
 
 
 #<---------Rotas Auxiliares do Login---------->
@@ -339,9 +394,9 @@ def entrar():
         session['tipo_perfil'] = user.tipo_perfil
 
         if user.tipo_perfil == 'aluno':
-            return redirect("/aluno")
+            return redirect(f"/aluno/{user.id}")
         elif user.tipo_perfil == 'professor':
-            return redirect("/professor")
+            return redirect(f"/professor/{user.id}")
     else:
         flash("Usuário ou senha inválidos", "login")
         return redirect("/login")
